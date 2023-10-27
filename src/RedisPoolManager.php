@@ -14,7 +14,6 @@ use Swoole\Database\RedisPool;
 
 class RedisPoolManager implements Factory
 {
-
     /**
      * The Redis server configurations.
      *
@@ -29,7 +28,6 @@ class RedisPoolManager implements Factory
      */
     protected $connections;
 
-
     /**
      * Create a new Redis manager instance.
      *
@@ -42,7 +40,6 @@ class RedisPoolManager implements Factory
     {
         $this->config = $config;
     }
-
 
     /**
      * Get a Redis pool connection by name.
@@ -60,7 +57,6 @@ class RedisPoolManager implements Factory
 
         return $this->connections[$name] = $this->resolve($name);
     }
-
 
     /**
      * Resolve the given connection by name.
@@ -86,7 +82,6 @@ class RedisPoolManager implements Factory
         );
     }
 
-
     /**
      * @param $config
      * @param $options
@@ -103,7 +98,6 @@ class RedisPoolManager implements Factory
 
         return new SwooleRedisPoolConnection(new RedisPool($redisConfig, $config['pool_size'] ?? 64));
     }
-
 
     /**
      * Return all created connections.

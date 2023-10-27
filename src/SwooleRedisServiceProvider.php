@@ -3,15 +3,15 @@
 namespace Antyblin\SwooleRedis;
 
 use Illuminate\Cache\CacheManager;
+use Illuminate\Queue\Connectors\RedisConnector;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Session\CacheBasedSessionHandler;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\ServiceProvider;
 
 class SwooleRedisServiceProvider extends ServiceProvider
 {
-
     protected $defer = false;
-
 
     /**
      * Bootstrap the application services.
@@ -21,7 +21,6 @@ class SwooleRedisServiceProvider extends ServiceProvider
     public function boot()
     {
     }
-
 
     /**
      * Register the service provider.
@@ -33,8 +32,8 @@ class SwooleRedisServiceProvider extends ServiceProvider
         $this->registerRedisPoolStore();
         $this->registerCache();
         $this->registerSession();
+        $this->registerQueue();
     }
-
 
     protected function registerRedisPoolStore()
     {
@@ -47,6 +46,14 @@ class SwooleRedisServiceProvider extends ServiceProvider
         $this->app->alias(RedisPoolManager::class, 'redis_pool');
     }
 
+    protected function registerQueue()
+    {
+        $this->app->afterResolving('queue', function (QueueManager $manager) {
+            $manager->addConnector('redis_pool', function () {
+                return new RedisConnector($this->app['redis_pool']);
+            });
+        });
+    }
 
     protected function registerSession()
     {
@@ -57,14 +64,16 @@ class SwooleRedisServiceProvider extends ServiceProvider
         });
     }
 
-
     protected function registerCache()
     {
         $this->app->afterResolving('cache', function (CacheManager $manager) {
             $manager->extend('redis_pool', function ($app) use ($manager) {
-                return $manager->repository(new SwooleRedisStore($app->make('redis_pool'),
+                return $manager->repository(
+                    new SwooleRedisStore(
+                        $app->make('redis_pool'),
                         config('cache.prefix'),
-                        config("cache.stores.redis_pool.connection", 'default'))
+                        config('cache.stores.redis_pool.connection', 'default')
+                    )
                 );
             });
         });

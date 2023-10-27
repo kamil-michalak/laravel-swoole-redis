@@ -1,6 +1,6 @@
 <?php
 /**
- * 功能说明
+ * 功能说明.
  * @author: falco, antyblin
  * Date: 4/26/21
  * Time: 1:42 PM
@@ -9,25 +9,22 @@
 namespace Antyblin\SwooleRedis;
 
 use Closure;
-use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Events\CommandExecuted;
 use Swoole\Database\RedisPool;
 
-class SwooleRedisPoolConnection extends Connection
+class SwooleRedisPoolConnection extends PhpRedisConnection
 {
-
     /**
      * @var RedisPool
      */
     protected RedisPool $pool;
 
-
     public function __construct(RedisPool $pool)
     {
-        $this->pool   = $pool;
+        $this->pool = $pool;
         $this->client = null;
     }
-
 
     /**
      * Subscribe to a set of given channels for messages.
@@ -53,7 +50,6 @@ class SwooleRedisPoolConnection extends Connection
         unset($loop);
     }
 
-
     /**
      * Get the underlying Redis client.
      *
@@ -63,7 +59,6 @@ class SwooleRedisPoolConnection extends Connection
     {
         return $this->pool->get();
     }
-
 
     /**
      * Run a command against the Redis database.
